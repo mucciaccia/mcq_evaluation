@@ -1,0 +1,8 @@
+{
+    "format": true,
+    "language": true,
+    "grammar": true,
+    "relevance": true,
+    "options": false,
+    "multi-hop": true
+}
