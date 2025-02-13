@@ -1,42 +1,14 @@
 import json
 import os
-import re
-from llm_api import GptApi
-from llm_api import LlmApi
+from gpt_api import GptApi
+
+llmApi = GptApi()
+model="gpt-4o-mini"
 
 config_path = "./config.json"
-question_list_path = "./question_list.json"
-
-input_path = "./question_list.json"
+input_path = "./input.json"
 temporary_path = "./temp.json"
-output_path = "./question_evaluation_list.json"
-
-with open(config_path, "r") as json_file:
-    config = json.load(json_file)
-
-# Checking the fields in the config.json file ------------------------------------------------------------------
-if "format" not in config:
-   raise Exception("Missing required 'format' field in config.json: expected a boolean (true or false).")
-if "language" not in config:
-   raise Exception("Missing required 'language' field in config.json: expected a boolean (true or false).")
-if "grammar" not in config:
-   raise Exception("Missing required 'grammar' field in config.json: expected a boolean (true or false).")
-if "relevance" not in config:
-   raise Exception("Missing required 'relevance' field in config.json: expected a boolean (true or false).")
-if "multi-hop" not in config:
-   raise Exception("Missing required 'multi-hop' field in config.json: expected a boolean (true or false).")
-if type(config["format"]) is not bool:
-    raise Exception(f"Invalid 'format' field in config.json: expected a boolean (true or false), but got {config['format']} instead.")
-if type(config["language"]) is not bool:
-    raise Exception(f"Invalid 'format' field in config.json: expected a boolean (true or false), but got {config['format']} instead.")
-if type(config["grammar"]) is not bool:
-    raise Exception(f"Invalid 'format' field in config.json: expected a boolean (true or false), but got {config['format']} instead.")
-if type(config["relevance"]) is not bool:
-    raise Exception(f"Invalid 'format' field in config.json: expected a boolean (true or false), but got {config['format']} instead.")
-if type(config["options"]) is not bool:
-    raise Exception(f"Invalid 'format' field in config.json: expected a boolean (true or false), but got {config['format']} instead.")
-if type(config["multi-hop"]) is not bool:
-    raise Exception(f"Invalid 'format' field in config.json: expected a boolean (true or false), but got {config['format']} instead.")
+output_path = "./output.json"
 
 language_prompt = """\
 Considering the following context and the question based on this context: 
@@ -52,7 +24,7 @@ Respond only 'Yes' or 'No'.
 
 grammar_prompt = """\
 Considering these specific terms and acronyms within the context: 
-{glossary} 
+<glossary>{glossary}</glossary>
 Considering the following context and the question based on this context: 
 <context>{context}</context>
 <question>{question}</question>
@@ -84,11 +56,35 @@ from 0 to 10, with 0 being completely wrong and
 the number corresponding to the score.
 """
 
-llmApi = GptApi()
-model="gpt-4o-mini"
+with open(config_path, "r") as json_file:
+    config = json.load(json_file)
 
-with open(question_list_path, "r") as json_file:
-    question_list = json.load(json_file)
+# Checking the fields in the config.json file ------------------------------------------------------------------
+if "format" not in config:
+   raise Exception("Missing required 'format' field in config.json: expected a boolean (true or false).")
+if "language" not in config:
+   raise Exception("Missing required 'language' field in config.json: expected a boolean (true or false).")
+if "grammar" not in config:
+   raise Exception("Missing required 'grammar' field in config.json: expected a boolean (true or false).")
+if "relevance" not in config:
+   raise Exception("Missing required 'relevance' field in config.json: expected a boolean (true or false).")
+if "multi-hop" not in config:
+   raise Exception("Missing required 'multi-hop' field in config.json: expected a boolean (true or false).")
+if type(config["format"]) is not bool:
+    raise Exception(f"Invalid 'format' field in config.json: expected a boolean (true or false), but got {config['format']} instead.")
+if type(config["language"]) is not bool:
+    raise Exception(f"Invalid 'format' field in config.json: expected a boolean (true or false), but got {config['format']} instead.")
+if type(config["grammar"]) is not bool:
+    raise Exception(f"Invalid 'format' field in config.json: expected a boolean (true or false), but got {config['format']} instead.")
+if type(config["relevance"]) is not bool:
+    raise Exception(f"Invalid 'format' field in config.json: expected a boolean (true or false), but got {config['format']} instead.")
+if type(config["options"]) is not bool:
+    raise Exception(f"Invalid 'format' field in config.json: expected a boolean (true or false), but got {config['format']} instead.")
+if type(config["multi-hop"]) is not bool:
+    raise Exception(f"Invalid 'format' field in config.json: expected a boolean (true or false), but got {config['format']} instead.")
+
+with open(input_path, "r") as input_json_file:
+    question_list = json.load(input_json_file)
 
 output = {}
 output["config"] = config
@@ -117,6 +113,21 @@ for i, question_data in enumerate(question_list["questions"]):
         continue
 
     try:
+        if 'question' not in question_data:
+            raise Exception("Missing required field: 'question'.")
+        if type(question_data['question']) is not str:
+            raise Exception(f"Invalid type for 'question': expected a string, but got {type(question_data['question']).__name__}.")
+        if 'options' not in question_data:
+            raise Exception("Missing required field: 'options'.")
+        if type(question_data['options']) is not list:
+            raise Exception(f"Invalid type for 'options': expected a list, but got {type(question_data['options']).__name__}.")
+        for index, option in enumerate(question_data['options']):
+            if type(option) is not str:
+                raise Exception(f"Invalid type in 'options' at index {index}: expected a string, but got {type(option).__name__}.")
+
+        last_evaluation["format"] = True
+        print(f"format={last_evaluation['format']}", end=", ", flush=True)
+
         if config["language"] is True and "language" not in last_evaluation:
             prompt = language_prompt.format(context=question_data["context"], question=question_data)
             completion = llmApi.call_api(prompt=prompt, model=model)
@@ -131,12 +142,10 @@ for i, question_data in enumerate(question_list["questions"]):
         if config["grammar"] is True and "grammar" not in last_evaluation:
             prompt = grammar_prompt.format(glossary= "", context=question_data["context"], question=question_data)
             completion = llmApi.call_api(prompt=prompt, model=model)
-            if 0==1:
-                raise Exception(f"Test")
             if (completion == "Yes") :
-                last_evaluation["grammar"] = True
-            elif (completion == "No"):
                 last_evaluation["grammar"] = False
+            elif (completion == "No"):
+                last_evaluation["grammar"] = True
             else:
                 raise Exception(f"The LLM should have responded with Yes or No, but responded with {completion}")
             print(f"grammar={last_evaluation['grammar']}", end=", ", flush=True)
@@ -144,8 +153,6 @@ for i, question_data in enumerate(question_list["questions"]):
         if config["relevance"] is True and "relevance" not in last_evaluation:
             prompt = relevance_prompt.format(context=question_data["context"], question=question_data)
             completion = llmApi.call_api(prompt=prompt, model=model)
-            if 0==1:
-                raise Exception(f"Test")
             if (completion.isdigit() and 0 <= int(completion) <= 10):
                 last_evaluation["relevance"] = True
             else:
@@ -177,6 +184,7 @@ for i, question_data in enumerate(question_list["questions"]):
                     print(f"{last_evaluation['options'][j]}", end="],", flush=True)
 
         last_evaluation["completed"] = True
+        print()
     except Exception as e:
         print(e)
         last_evaluation["completed"] = False
@@ -195,10 +203,6 @@ for i, question_data in enumerate(question_list["questions"]):
             outfile.flush()
 
         last_evaluation = {}
-        print(" Evaluation completed.")
-
-    #raise Exception()
-
 
 with open(output_path, "w") as output_file:
     json_output = json.dumps(output, indent="\t")

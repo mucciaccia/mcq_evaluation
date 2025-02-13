@@ -3,6 +3,6 @@
     "language": true,
     "grammar": true,
     "relevance": true,
-    "options": false,
-    "multi-hop": true
+    "options": true,
+    "multi-hop": false
 }

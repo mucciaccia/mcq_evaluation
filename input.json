@@ -1,0 +1,41 @@
+{
+    "questions":
+        [
+            {
+                "context": "Article 1: The Institutional Scientific Initiation Program – ISIP of the Federal University of Espírito Santo – FUES is aimed at introducing undergraduate students to research. Its main purpose is to encourage students’ scientific careers, preparing them for graduate school. To that end, these students participate actively in research projects of recognized academic quality, scientific merit, and adequate supervision, on an individual and continuous basis.\n\n§ 1. Based on the basic principles established by the National Council for Scientific and Technological Development (NCSTD), the main objectives of the ISIP are:\nI. to awaken the scientific calling and encourage new potential talents among undergraduate students;\nII. to provide the Institution with a tool for formulating undergraduate research initiation policies;\nIII. to foster greater synergy between undergraduate and graduate programs;\nIV. to contribute to the training of human resources for research;\nV. to decisively help reduce the average time students spend in graduate school;\nVI. to encourage productive researchers to involve undergraduate students in scientific, technological, and artistic-cultural activities;\nVII. to enable the student, under the guidance of a qualified researcher, to learn research techniques and methods, as well as to stimulate the development of scientific thinking and creativity, arising from exposure to real research problems.",
+                "question": "Which statement best reflects the main purpose of the ISIP at FUES?",
+                "options": [
+                    "Encourage students' scientific careers and prepare them for graduate school",
+                    "Organize only administrative tasks for faculty members",
+                    "Offer volunteer positions with no academic focus",
+                    "Supervise teachers in primary education",
+                    "Focus exclusively on extension projects"
+                ],
+                "correct_answer": 0
+            },
+            {
+                "context": "Article 2: The management of the program, ensuring compliance with these regulations, is the responsibility of the Institutional Committee for Scientific Initiation – ICSI.",
+                "question": "Which body is primarily responsible for ensuring compliance with the ISIP regulations?",
+                "options": [
+                    "The Institutional Committee for Scientific Initiation (ICSI)",
+                    "The Rector’s Office",
+                    "External funding agencies",
+                    "The Commission for Undergraduate Teaching and Extension",
+                    "A private consulting firm"
+                ],
+                "correct_answer": 0
+            },
+            {
+                "context": "Article 3: The ICSI shall publish a specific annual call for applications to select students for the FUES ISIP.",
+                "question": "What must the ICSI publish each year to select students for the ISIP?",
+                "options": [
+                    "A specific annual call (edital)",
+                    "A list of internal administrative regulations",
+                    "A guide on graduate admissions",
+                    "A confidential selection procedure shared only with faculty",
+                    "A single final exam schedule"
+                ],
+                "correct_answer": 0
+            }
+        ]
+}
